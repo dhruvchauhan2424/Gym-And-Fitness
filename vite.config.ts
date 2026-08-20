@@ -13,3 +13,6 @@ export default defineConfig({
     server: { entry: "server" },
   },
 });
+resolve: {
+  tsconfigPaths: true,
+}
