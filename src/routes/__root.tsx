@@ -9,17 +9,308 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 
-import { reportLovableError } from "../lib/lovable-error-reporting";
 
-import { Cursor } from "@/components/apex/Cursor";
-import { Footer } from "@/components/apex/Footer";
-import { Nav } from "@/components/apex/Nav";
-import { Preloader } from "@/components/apex/Preloader";
-import { SmoothScroll } from "@/components/apex/SmoothScroll";
+// ----------------------------------------------------
+// PRELOADER
+// ----------------------------------------------------
+
+function Preloader() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setLoading(false);
+    }, 700);
+
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  if (!loading) return null;
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 99999,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "#0a0a0a",
+        color: "#fff",
+        transition: "opacity 0.5s ease",
+      }}
+    >
+      <div
+        style={{
+          fontSize: "14px",
+          letterSpacing: "0.2em",
+          textTransform: "uppercase",
+        }}
+      >
+        Apex Fitness
+      </div>
+    </div>
+  );
+}
+
+
+// ----------------------------------------------------
+// CUSTOM CURSOR
+// ----------------------------------------------------
+
+function Cursor() {
+  const [position, setPosition] = useState({
+    x: -100,
+    y: -100,
+  });
+
+  useEffect(() => {
+    const handleMove = (event: MouseEvent) => {
+      setPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
+    };
+
+    window.addEventListener("mousemove", handleMove);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMove);
+    };
+  }, []);
+
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        position: "fixed",
+        left: position.x,
+        top: position.y,
+        width: "12px",
+        height: "12px",
+        borderRadius: "50%",
+        background: "currentColor",
+        color: "#ffffff",
+        pointerEvents: "none",
+        zIndex: 99998,
+        transform: "translate(-50%, -50%)",
+        mixBlendMode: "difference",
+        transition:
+          "left 0.08s ease-out, top 0.08s ease-out",
+      }}
+    />
+  );
+}
+
+
+// ----------------------------------------------------
+// SMOOTH SCROLL
+// ----------------------------------------------------
+
+function SmoothScroll() {
+  useEffect(() => {
+    const handleAnchorClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+
+      const link = target?.closest(
+        'a[href^="#"]'
+      ) as HTMLAnchorElement | null;
+
+      if (!link) return;
+
+      const href = link.getAttribute("href");
+
+      if (!href || href === "#") return;
+
+      const element = document.querySelector(href);
+
+      if (!element) return;
+
+      event.preventDefault();
+
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    };
+
+    document.addEventListener(
+      "click",
+      handleAnchorClick
+    );
+
+    return () => {
+      document.removeEventListener(
+        "click",
+        handleAnchorClick
+      );
+    };
+  }, []);
+
+  return null;
+}
+
+
+// ----------------------------------------------------
+// NAVIGATION
+// ----------------------------------------------------
+
+function Nav() {
+  return (
+    <header
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 1000,
+        padding: "20px 24px",
+      }}
+    >
+      <nav
+        style={{
+          maxWidth: "1200px",
+          margin: "0 auto",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "14px 20px",
+          borderRadius: "999px",
+          background: "rgba(10, 10, 10, 0.75)",
+          backdropFilter: "blur(14px)",
+          WebkitBackdropFilter: "blur(14px)",
+          border: "1px solid rgba(255,255,255,0.1)",
+        }}
+      >
+        <Link
+          to="/"
+          style={{
+            color: "#fff",
+            textDecoration: "none",
+            fontWeight: 700,
+            letterSpacing: "0.08em",
+          }}
+        >
+          APEX
+        </Link>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "24px",
+          }}
+        >
+          <a
+            href="#about"
+            style={{
+              color: "#fff",
+              textDecoration: "none",
+              fontSize: "13px",
+            }}
+          >
+            About
+          </a>
+
+          <a
+            href="#services"
+            style={{
+              color: "#fff",
+              textDecoration: "none",
+              fontSize: "13px",
+            }}
+          >
+            Services
+          </a>
+
+          <a
+            href="#contact"
+            style={{
+              color: "#fff",
+              textDecoration: "none",
+              fontSize: "13px",
+            }}
+          >
+            Contact
+          </a>
+        </div>
+      </nav>
+    </header>
+  );
+}
+
+
+// ----------------------------------------------------
+// FOOTER
+// ----------------------------------------------------
+
+function Footer() {
+  return (
+    <footer
+      style={{
+        padding: "60px 24px 30px",
+        background: "#0a0a0a",
+        color: "#fff",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: "1200px",
+          margin: "0 auto",
+          display: "flex",
+          flexDirection: "column",
+          gap: "20px",
+        }}
+      >
+        <div
+          style={{
+            fontSize: "32px",
+            fontWeight: 700,
+            letterSpacing: "-0.03em",
+          }}
+        >
+          APEX FITNESS
+        </div>
+
+        <p
+          style={{
+            margin: 0,
+            maxWidth: "500px",
+            color: "rgba(255,255,255,0.6)",
+            lineHeight: 1.7,
+          }}
+        >
+          A private strength and performance facility
+          built for people who refuse to settle.
+        </p>
+
+        <div
+          style={{
+            marginTop: "30px",
+            paddingTop: "20px",
+            borderTop:
+              "1px solid rgba(255,255,255,0.1)",
+            color: "rgba(255,255,255,0.45)",
+            fontSize: "12px",
+          }}
+        >
+          © {new Date().getFullYear()} Apex Fitness.
+          All rights reserved.
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+
+// ----------------------------------------------------
+// 404 PAGE
+// ----------------------------------------------------
 
 function NotFoundComponent() {
   return (
@@ -49,7 +340,8 @@ function NotFoundComponent() {
         </h2>
 
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+          The page you're looking for doesn't exist or
+          has been moved.
         </p>
 
         <div className="mt-6">
@@ -79,15 +371,27 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+
+// ----------------------------------------------------
+// ERROR PAGE
+// ----------------------------------------------------
+
+function ErrorComponent({
+  error,
+  reset,
+}: {
+  error: Error;
+  reset: () => void;
+}) {
   console.error(error);
 
   const router = useRouter();
 
   useEffect(() => {
-    reportLovableError(error, {
-      boundary: "tanstack_root_error_component",
-    });
+    console.error(
+      "Apex application error:",
+      error
+    );
   }, [error]);
 
   return (
@@ -105,8 +409,8 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
         </h1>
 
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back
-          home.
+          Something went wrong on our end. You can try
+          refreshing or head back home.
         </p>
 
         <div className="mt-6 flex flex-wrap justify-center gap-2">
@@ -160,6 +464,11 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+
+// ----------------------------------------------------
+// ROOT ROUTE
+// ----------------------------------------------------
+
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
 }>()({
@@ -171,7 +480,8 @@ export const Route = createRootRouteWithContext<{
 
       {
         name: "viewport",
-        content: "width=device-width, initial-scale=1",
+        content:
+          "width=device-width, initial-scale=1",
       },
 
       {
@@ -196,12 +506,14 @@ export const Route = createRootRouteWithContext<{
 
       {
         property: "og:title",
-        content: "APEX FITNESS — Forge Your Limits",
+        content:
+          "APEX FITNESS — Forge Your Limits",
       },
 
       {
         property: "og:description",
-        content: "A private London performance facility.",
+        content:
+          "A private London performance facility.",
       },
 
       {
@@ -234,7 +546,8 @@ export const Route = createRootRouteWithContext<{
 
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap",
+        href:
+          "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap",
       },
 
       {
@@ -251,12 +564,24 @@ export const Route = createRootRouteWithContext<{
   }),
 
   shellComponent: RootShell,
+
   component: RootComponent,
+
   notFoundComponent: NotFoundComponent,
+
   errorComponent: ErrorComponent,
 });
 
-function RootShell({ children }: { children: ReactNode }) {
+
+// ----------------------------------------------------
+// HTML SHELL
+// ----------------------------------------------------
+
+function RootShell({
+  children,
+}: {
+  children: ReactNode;
+}) {
   return (
     <html lang="en">
       <head>
@@ -265,7 +590,9 @@ function RootShell({ children }: { children: ReactNode }) {
 
       <body
         style={{
-          fontFamily: '"Manrope", system-ui, sans-serif',
+          fontFamily:
+            '"Manrope", system-ui, sans-serif',
+          margin: 0,
         }}
       >
         {children}
@@ -276,8 +603,14 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+
+// ----------------------------------------------------
+// ROOT COMPONENT
+// ----------------------------------------------------
+
 function RootComponent() {
-  const { queryClient } = Route.useRouteContext();
+  const { queryClient } =
+    Route.useRouteContext();
 
   return (
     <QueryClientProvider client={queryClient}>
